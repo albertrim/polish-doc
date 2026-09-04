@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="ko" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회의실 예약 방식 변경</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#16191d; --ink-2:#3d444d; --ink-3:#6b737d;
+    --line:#e2e6ea; --line-2:#cdd4da;
+    --bg:#ffffff; --bg-2:#f6f8fa; --bg-3:#eef2f5;
+    --ok:#1a7f4b; --ok-bg:#e8f6ee;
+    --warn:#9a6400; --warn-bg:#fdf3e0;
+    --bad:#b3261e; --bad-bg:#fdecea;
+    --key:#1b4fa8; --key-bg:#e9f0fb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg-2); color:var(--ink);
+    font:19px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Malgun Gothic",
+         "Hiragino Sans","Yu Gothic UI","Noto Sans JP",
+         "PingFang SC","Microsoft YaHei","Noto Sans SC",
+         "PingFang TC","Microsoft JhengHei","Noto Sans TC",
+         "Noto Sans Arabic","Noto Sans Devanagari","Noto Sans Thai",
+         Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; text-wrap:pretty;
+  }
+  .wrap{max-width:1240px; margin:0 auto; padding:0 32px 80px}
+  .sheet{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:52px 56px; margin-top:32px}
+
+  .meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size:14px; color:var(--ink-3); margin-bottom:20px}
+  .tag{display:inline-block; padding:3px 10px; border-radius:999px; background:var(--bg-3); color:var(--ink-2); font-size:13px; font-weight:600}
+  .tag.confid{background:var(--bad-bg); color:var(--bad)}
+  h1{font-size:36px; line-height:1.3; letter-spacing:-.02em; margin:0 0 12px}
+  .sub{font-size:19px; color:var(--ink-2); margin:0 0 28px}
+  .lede{background:var(--key-bg); border-inline-start:4px solid var(--key);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        padding:20px 24px; margin:0 0 36px; font-size:19px}
+  .lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+
+  h2{font-size:26px; line-height:1.35; letter-spacing:-.015em; margin:52px 0 16px; padding-top:20px; border-top:2px solid var(--ink)}
+  h2 .n{display:inline-block; min-width:34px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  h3{font-size:21px; line-height:1.4; margin:34px 0 12px}
+  p{margin:0 0 16px}
+  strong{font-weight:700}
+  a{color:var(--key)}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:28px 0}
+  .kpi{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .kpi b{display:block; font-size:32px; line-height:1.15; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .kpi span{display:block; margin-top:6px; font-size:15px; color:var(--ink-3); line-height:1.5}
+
+  .scroll{overflow-x:auto; margin:22px 0; border:1px solid var(--line); border-radius:10px}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:17px}
+  th,td{padding:13px 16px; text-align:start; vertical-align:top; border-bottom:1px solid var(--line)}
+  th{background:var(--bg-3); font-size:15px; font-weight:700; white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:end; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin:24px 0}
+  .card{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:20px 22px; font-size:17px}
+  .card h4{margin:0 0 8px; font-size:18px}
+  .card p:last-child{margin:0}
+
+  .b{display:inline-block; padding:2px 9px; border-radius:6px; font-size:14px; font-weight:700; white-space:nowrap}
+  .b.ok{background:var(--ok-bg); color:var(--ok)}
+  .b.warn{background:var(--warn-bg); color:var(--warn)}
+  .b.bad{background:var(--bad-bg); color:var(--bad)}
+  .b.key{background:var(--key-bg); color:var(--key)}
+
+  .note{border:1px solid var(--line-2); border-inline-start:4px solid var(--ink-3);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        background:var(--bg-2); padding:18px 22px; margin:24px 0}
+  .note.warn{border-inline-start-color:var(--warn); background:var(--warn-bg)}
+  .note.bad{border-inline-start-color:var(--bad); background:var(--bad-bg)}
+  .note p:last-child{margin:0}
+
+  figure{margin:30px 0; padding:26px; background:var(--bg-2); border:1px solid var(--line); border-radius:10px; overflow-x:auto}
+  figure svg{display:block; max-width:100%; height:auto; margin:0 auto}
+  figcaption{margin-top:16px; font-size:15px; color:var(--ink-3); text-align:center; line-height:1.55}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:stretch; gap:0; justify-content:center}
+  .step{flex:0 1 200px; background:var(--bg); border:2px solid var(--line-2); border-radius:10px; padding:16px 18px; font-size:16px; line-height:1.5}
+  .step b{display:block; font-size:17px; margin-bottom:5px}
+  .step.on{border-color:var(--key); background:var(--key-bg)}
+  .arrow{display:flex; align-items:center; padding:0 12px; font-size:26px; color:var(--ink-3)}
+
+  ul,ol{margin:0 0 18px; padding-inline-start:24px}
+  li{margin-bottom:8px}
+  li:last-child{margin-bottom:0}
+
+  code{background:var(--bg-3); padding:2px 6px; border-radius:5px; font-size:.9em}
+  pre{background:var(--bg-3); padding:18px 20px; border-radius:10px; overflow-x:auto; font-size:15px; line-height:1.55}
+  pre code{background:none; padding:0}
+  /* code, paths and commands stay left-to-right even inside an RTL document */
+  code,pre,.num{direction:ltr; unicode-bidi:isolate}
+
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--line); font-size:14px; color:var(--ink-3); line-height:1.6}
+
+  @media (max-width:860px){
+    body{font-size:18px}
+    .wrap{padding:0 16px 60px}
+    .sheet{padding:32px 22px; border-radius:0; margin-top:0; border-inline:0}
+    h1{font-size:29px} h2{font-size:23px} h3{font-size:20px}
+    .flow{flex-direction:column} .arrow{justify-content:center; padding:8px 0; transform:rotate(90deg)}
+  }
+  @media print{
+    body{background:#fff; font-size:11pt}
+    .sheet{border:0; padding:0; margin:0}
+    h2{break-after:avoid} figure,.scroll,.note{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="sheet">
+
+  <div class="note bad">
+    <p><strong>이 문서는 /polish-doc 의 출력 형식을 보여주는 예시입니다.</strong> 회사도 내용도 전부 가상입니다. 실제 기록이 아닙니다.</p>
+  </div>
+
+  <div class="meta">
+    <span class="tag confid">대외비</span>
+    <span class="tag">업무 안내</span>
+    <span>총무팀 · 2026-09-04</span>
+  </div>
+
+  <h1>회의실 예약, 다음 주부터 앱으로 합니다</h1>
+  <p class="sub">엑셀 파일 예약을 끝내는 이유와, 바뀌는 것 세 가지</p>
+
+  <div class="lede">
+    <p><strong>9월 8일(월)부터 공유 엑셀 파일로는 회의실을 잡을 수 없습니다.</strong> 사내 앱에서 잡으시면 됩니다.</p>
+    <p>지금 엑셀에 들어 있는 예약은 총무팀이 옮겨 둡니다. 다시 넣지 않으셔도 됩니다.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b>9/8</b><span>앱 예약 시작</span></div>
+    <div class="kpi"><b>9/5</b><span>엑셀 파일 잠금</span></div>
+    <div class="kpi"><b>0건</b><span>직접 옮기실 예약</span></div>
+    <div class="kpi"><b>14개</b><span>대상 회의실</span></div>
+  </div>
+
+  <h2><span class="n">1</span>왜 바꾸나</h2>
+
+  <p>같은 시간에 두 팀이 잡는 일이 <strong>8월에만 11번</strong> 있었습니다. 엑셀은 두 사람이 동시에 열면 나중에 저장한 쪽이 앞사람 예약을 덮어씁니다. 파일 구조상 막을 방법이 없습니다.</p>
+
+  <figure>
+    <div class="flow">
+      <div class="step"><b>A팀이 연다</b>10시 칸이 비어 있다</div>
+      <div class="arrow">→</div>
+      <div class="step"><b>B팀도 연다</b>B팀 화면에도 비어 있다</div>
+      <div class="arrow">→</div>
+      <div class="step"><b>둘 다 저장</b>나중에 누른 쪽만 남는다</div>
+      <div class="arrow">→</div>
+      <div class="step on"><b>10시에 만난다</b>둘 다 예약했다고 믿는다</div>
+    </div>
+    <figcaption>겹침은 실수가 아니라 파일 구조 때문에 생깁니다. 조심해서 쓰면 줄어드는 문제가 아닙니다.</figcaption>
+  </figure>
+
+  <h2><span class="n">2</span>무엇이 바뀌나</h2>
+
+  <div class="scroll">
+  <table>
+    <thead>
+      <tr><th>항목</th><th>지금</th><th>9월 8일부터</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>예약하는 곳</td><td>공유 드라이브 엑셀</td><td>사내 앱 &gt; 회의실</td></tr>
+      <tr><td>겹침</td><td>막지 못함</td><td>이미 찬 시간은 눌리지 않음</td></tr>
+      <tr><td>취소</td><td>직접 지움</td><td>앱에서 취소. 대기 건 자동 확정</td></tr>
+      <tr><td>노쇼</td><td>확인 안 됨</td><td>15분 미입실 시 자동 해제</td></tr>
+      <tr><td>당일 예약</td><td>가능</td><td>가능. 시작 10분 전까지</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <p><strong>노쇼 자동 해제는 9월 22일부터입니다.</strong> 2주는 안내만 하고 풀지 않습니다. 익숙해질 시간이 필요하다고 봤습니다.</p>
+  </div>
+
+  <h2><span class="n">3</span>바뀌지 않는 것</h2>
+
+  <div class="cards">
+    <div class="card">
+      <h4>회의실과 자리 배치</h4>
+      <p>14개 그대로입니다. 이름도 안 바뀝니다.</p>
+    </div>
+    <div class="card">
+      <h4>예약 권한</h4>
+      <p>전 직원 그대로입니다. 팀장 승인 같은 건 생기지 않습니다.</p>
+    </div>
+    <div class="card">
+      <h4>대회의실 우선권</h4>
+      <p>전사 회의가 먼저인 규칙은 그대로 둡니다. 총무팀이 직접 조정합니다.</p>
+    </div>
+  </div>
+
+  <h2><span class="n">4</span>일정</h2>
+
+  <figure>
+    <svg viewBox="0 0 900 150" role="img" aria-label="9월 4일 안내부터 9월 22일 노쇼 해제까지 일정">
+      <line x1="60" y1="70" x2="840" y2="70" stroke="#cdd4da" stroke-width="3"/>
+      <g fill="#1b4fa8">
+        <circle cx="60" cy="70" r="9"/><circle cx="320" cy="70" r="9"/>
+        <circle cx="580" cy="70" r="9"/><circle cx="840" cy="70" r="9"/>
+      </g>
+      <g font-size="17" font-weight="700" fill="#16191d" text-anchor="middle">
+        <text x="60" y="42">9/4</text><text x="320" y="42">9/5</text>
+        <text x="580" y="42">9/8</text><text x="840" y="42">9/22</text>
+      </g>
+      <g font-size="15" fill="#6b737d" text-anchor="middle">
+        <text x="60" y="105">안내 (오늘)</text>
+        <text x="320" y="105">엑셀 잠금</text>
+        <text x="580" y="105">앱 예약 시작</text>
+        <text x="840" y="105">노쇼 해제 시작</text>
+      </g>
+    </svg>
+    <figcaption>직접 하실 일은 9월 8일부터 앱을 쓰시는 것 하나입니다. 나머지는 총무팀이 합니다.</figcaption>
+  </figure>
+
+  <h2><span class="n">5</span>이럴 땐 이렇게</h2>
+
+  <div class="scroll">
+  <table>
+    <thead>
+      <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>앱에 회의실 메뉴가 없다</td>
+        <td>앱 버전이 낮음</td>
+        <td>스토어에서 업데이트. 4.2 이상 필요</td>
+      </tr>
+      <tr>
+        <td>옮겨졌다는 예약이 안 보인다</td>
+        <td>예약자 이름이 엑셀과 다르게 적혀 있었음</td>
+        <td>총무팀에 알려 주시면 찾아 드립니다 <span class="b warn">확인 필요</span></td>
+      </tr>
+      <tr>
+        <td>이미 찬 시간을 꼭 써야 한다</td>
+        <td>앱에서는 못 누름</td>
+        <td>잡은 팀과 직접 조율. 총무팀은 개입하지 않습니다 <span class="b bad">불가</span></td>
+      </tr>
+      <tr>
+        <td>외부 손님용 예약</td>
+        <td>기존과 동일</td>
+        <td>앱에서 방문객 체크. 로비에 명단이 자동으로 갑니다 <span class="b ok">그대로</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <p>앱으로 옮기면서 못 살린 기능이 하나 있습니다. <strong>반복 예약</strong>입니다. 매주 같은 시간 회의는 당분간 매번 잡으셔야 합니다. 언제 되는지는 아직 못 들었습니다. 확인되면 다시 알려 드리겠습니다.</p>
+  </div>
+
+  <footer>
+    총무팀 · 2026-09-04 · 대외비 — 사외 반출 금지<br>
+    문의: 총무팀 내선 1200
+  </footer>
+
+</div></div>
+</body>
+</html>

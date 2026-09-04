@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Same-day refunds</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#16191d; --ink-2:#3d444d; --ink-3:#6b737d;
+    --line:#e2e6ea; --line-2:#cdd4da;
+    --bg:#ffffff; --bg-2:#f6f8fa; --bg-3:#eef2f5;
+    --ok:#1a7f4b; --ok-bg:#e8f6ee;
+    --warn:#9a6400; --warn-bg:#fdf3e0;
+    --bad:#b3261e; --bad-bg:#fdecea;
+    --key:#1b4fa8; --key-bg:#e9f0fb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg-2); color:var(--ink);
+    font:19px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Malgun Gothic",
+         "Hiragino Sans","Yu Gothic UI","Noto Sans JP",
+         "PingFang SC","Microsoft YaHei","Noto Sans SC",
+         "PingFang TC","Microsoft JhengHei","Noto Sans TC",
+         "Noto Sans Arabic","Noto Sans Devanagari","Noto Sans Thai",
+         Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; text-wrap:pretty;
+  }
+  .wrap{max-width:1240px; margin:0 auto; padding:0 32px 80px}
+  .sheet{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:52px 56px; margin-top:32px}
+
+  .meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size:14px; color:var(--ink-3); margin-bottom:20px}
+  .tag{display:inline-block; padding:3px 10px; border-radius:999px; background:var(--bg-3); color:var(--ink-2); font-size:13px; font-weight:600}
+  .tag.confid{background:var(--bad-bg); color:var(--bad)}
+  h1{font-size:36px; line-height:1.3; letter-spacing:-.02em; margin:0 0 12px}
+  .sub{font-size:19px; color:var(--ink-2); margin:0 0 28px}
+  .lede{background:var(--key-bg); border-inline-start:4px solid var(--key);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        padding:20px 24px; margin:0 0 36px; font-size:19px}
+  .lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+
+  h2{font-size:26px; line-height:1.35; letter-spacing:-.015em; margin:52px 0 16px; padding-top:20px; border-top:2px solid var(--ink)}
+  h2 .n{display:inline-block; min-width:34px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  h3{font-size:21px; line-height:1.4; margin:34px 0 12px}
+  p{margin:0 0 16px}
+  strong{font-weight:700}
+  a{color:var(--key)}
+
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:28px 0}
+  .kpi{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .kpi b{display:block; font-size:32px; line-height:1.15; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .kpi span{display:block; margin-top:6px; font-size:15px; color:var(--ink-3); line-height:1.5}
+
+  .scroll{overflow-x:auto; margin:22px 0; border:1px solid var(--line); border-radius:10px}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:17px}
+  th,td{padding:13px 16px; text-align:start; vertical-align:top; border-bottom:1px solid var(--line)}
+  th{background:var(--bg-3); font-size:15px; font-weight:700; white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:end; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin:24px 0}
+  .card{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:20px 22px; font-size:17px}
+  .card h4{margin:0 0 8px; font-size:18px}
+  .card p:last-child{margin:0}
+
+  .b{display:inline-block; padding:2px 9px; border-radius:6px; font-size:14px; font-weight:700; white-space:nowrap}
+  .b.ok{background:var(--ok-bg); color:var(--ok)}
+  .b.warn{background:var(--warn-bg); color:var(--warn)}
+  .b.bad{background:var(--bad-bg); color:var(--bad)}
+  .b.key{background:var(--key-bg); color:var(--key)}
+
+  .note{border:1px solid var(--line-2); border-inline-start:4px solid var(--ink-3);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        background:var(--bg-2); padding:18px 22px; margin:24px 0}
+  .note.warn{border-inline-start-color:var(--warn); background:var(--warn-bg)}
+  .note.bad{border-inline-start-color:var(--bad); background:var(--bad-bg)}
+  .note p:last-child{margin:0}
+
+  figure{margin:30px 0; padding:26px; background:var(--bg-2); border:1px solid var(--line); border-radius:10px; overflow-x:auto}
+  figure svg{display:block; max-width:100%; height:auto; margin:0 auto}
+  figcaption{margin-top:16px; font-size:15px; color:var(--ink-3); text-align:center; line-height:1.55}
+
+  .flow{display:flex; flex-wrap:wrap; align-items:stretch; gap:0; justify-content:center}
+  .step{flex:0 1 200px; background:var(--bg); border:2px solid var(--line-2); border-radius:10px; padding:16px 18px; font-size:16px; line-height:1.5}
+  .step b{display:block; font-size:17px; margin-bottom:5px}
+  .step.on{border-color:var(--key); background:var(--key-bg)}
+  .arrow{display:flex; align-items:center; padding:0 12px; font-size:26px; color:var(--ink-3)}
+
+  ul,ol{margin:0 0 18px; padding-inline-start:24px}
+  li{margin-bottom:8px}
+  li:last-child{margin-bottom:0}
+
+  code{background:var(--bg-3); padding:2px 6px; border-radius:5px; font-size:.9em}
+  pre{background:var(--bg-3); padding:18px 20px; border-radius:10px; overflow-x:auto; font-size:15px; line-height:1.55}
+  pre code{background:none; padding:0}
+  /* code, paths and commands stay left-to-right even inside an RTL document */
+  code,pre,.num{direction:ltr; unicode-bidi:isolate}
+
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--line); font-size:14px; color:var(--ink-3); line-height:1.6}
+
+  @media (max-width:860px){
+    body{font-size:18px}
+    .wrap{padding:0 16px 60px}
+    .sheet{padding:32px 22px; border-radius:0; margin-top:0; border-inline:0}
+    h1{font-size:29px} h2{font-size:23px} h3{font-size:20px}
+    .flow{flex-direction:column} .arrow{justify-content:center; padding:8px 0; transform:rotate(90deg)}
+  }
+  @media print{
+    body{background:#fff; font-size:11pt}
+    .sheet{border:0; padding:0; margin:0}
+    h2{break-after:avoid} figure,.scroll,.note{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="sheet">
+
+  <div class="note bad">
+    <p><strong>This document is a sample of what /polish-doc produces.</strong> The company and everything in it are invented. It is not a real record.</p>
+  </div>
+
+  <div class="meta">
+    <span class="tag confid">Confidential</span>
+    <span class="tag">Ops notice</span>
+    <span>Payments team &middot; September 4, 2026</span>
+  </div>
+
+  <h1>Refunds go out the same day from October 1</h1>
+  <p class="sub">Why the nightly batch is going away, and the two things that change for support</p>
+
+  <div class="lede">
+    <p><strong>From October 1, a refund you approve leaves us within the hour.</strong> Today it waits for a job that runs at 2 AM.</p>
+    <p>Nothing changes in how you approve one. The button is in the same place and the limits are the same.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b>3.4 days</b><span>Average wait today, approval to money leaving</span></div>
+    <div class="kpi"><b>1.2 days</b><span>What it becomes</span></div>
+    <div class="kpi"><b>2,100</b><span>Refunds a month affected</span></div>
+    <div class="kpi"><b>0</b><span>Steps you have to change</span></div>
+  </div>
+
+  <h2><span class="n">1</span>Where the days actually go</h2>
+
+  <p>Support has been telling customers the bank is slow. That is <strong>not where most of the wait comes from.</strong> Two of the 3.4 days are ours.</p>
+
+  <figure>
+    <div class="flow">
+      <div class="step"><b>You approve</b>Takes about a minute</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step on"><b>It sits in a queue</b>Up to 22 hours, doing nothing</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step on"><b>2 AM batch picks it up</b>Once a night, all of them at once</div>
+      <div class="arrow">&rarr;</div>
+      <div class="step"><b>Card issuer posts it</b>1 to 3 business days, out of our hands</div>
+    </div>
+    <figcaption>The two blue steps are the ones we control. Removing them is the whole change.</figcaption>
+  </figure>
+
+  <div class="cards">
+    <div class="card">
+      <h4>&#10060; What we have been saying</h4>
+      <p>"Refunds take three to five days because the bank has to process them."</p>
+    </div>
+    <div class="card">
+      <h4>&#9989; What is true</h4>
+      <p>The bank takes one to three days. We add two before they ever see it.</p>
+    </div>
+  </div>
+
+  <p>I wrote the original support macro, and it put all of the delay on the bank. That one is on me. The macro gets rewritten before October 1.</p>
+
+  <h2><span class="n">2</span>What changes</h2>
+
+  <div class="scroll">
+  <table>
+    <thead>
+      <tr><th>&nbsp;</th><th>Today</th><th>From October 1</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>When it leaves us</td><td>The next 2 AM run</td><td>Within an hour of approval</td></tr>
+      <tr><td>Status in the tool</td><td><code>Queued</code> until morning</td><td><code>Sent</code>, with a timestamp</td></tr>
+      <tr><td>If it fails</td><td>You find out the next day</td><td>You get a message in about ten minutes</td></tr>
+      <tr><td>Weekend approvals</td><td>Wait until Monday's run</td><td>Go out on the weekend</td></tr>
+      <tr><td>What you tell the customer</td><td>"Three to five days"</td><td>"One to three business days"</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note warn">
+    <p><strong>Do not change the wording you give customers before October 1.</strong> Until the last batch runs on September 26, the old timing is still the honest answer.</p>
+  </div>
+
+  <h2><span class="n">3</span>What stays the same</h2>
+
+  <div class="cards">
+    <div class="card">
+      <h4>Approval limits</h4>
+      <p>Anything over $500 still needs a second approver. Same threshold, same people.</p>
+    </div>
+    <div class="card">
+      <h4>The refund screen</h4>
+      <p>Same place in the tool, same fields. Only the status wording is different.</p>
+    </div>
+    <div class="card">
+      <h4>Who can issue one</h4>
+      <p>Every support agent, as now. No new role, no new request form.</p>
+    </div>
+  </div>
+
+  <h2><span class="n">4</span>Dates</h2>
+
+  <figure>
+    <svg viewBox="0 0 900 150" role="img" aria-label="Timeline from this notice on September 4 to same-day refunds on October 1">
+      <line x1="60" y1="70" x2="840" y2="70" stroke="#cdd4da" stroke-width="3"/>
+      <g fill="#1b4fa8">
+        <circle cx="60" cy="70" r="9"/><circle cx="320" cy="70" r="9"/>
+        <circle cx="580" cy="70" r="9"/><circle cx="840" cy="70" r="9"/>
+      </g>
+      <g font-size="17" font-weight="700" fill="#16191d" text-anchor="middle">
+        <text x="60" y="42">Sep 4</text><text x="320" y="42">Sep 22</text>
+        <text x="580" y="42">Sep 26</text><text x="840" y="42">Oct 1</text>
+      </g>
+      <g font-size="15" fill="#6b737d" text-anchor="middle">
+        <text x="60" y="105">This notice</text>
+        <text x="320" y="105">New status wording</text>
+        <text x="580" y="105">Last nightly batch</text>
+        <text x="840" y="105">Same-day refunds</text>
+      </g>
+    </svg>
+    <figcaption>The only date you need to hold is October 1. Everything before it happens without you.</figcaption>
+  </figure>
+
+  <h2><span class="n">5</span>When it goes wrong</h2>
+
+  <div class="scroll">
+  <table>
+    <thead>
+      <tr><th>What you see</th><th>Why</th><th>What to do</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Still <code>Pending</code> a day later</td>
+        <td>The card issuer has it. We are done.</td>
+        <td>Tell the customer one to three business days <span class="b ok">Normal</span></td>
+      </tr>
+      <tr>
+        <td>Approve button is greyed out</td>
+        <td>Over $500, no second approver yet</td>
+        <td>Unchanged from today. Ask a team lead <span class="b key">Unchanged</span></td>
+      </tr>
+      <tr>
+        <td>Customer says nothing arrived</td>
+        <td>The card was closed after they paid</td>
+        <td>Send it to finance. They pay it out by transfer, about two days <span class="b warn">Needs a check</span></td>
+      </tr>
+      <tr>
+        <td>Purchase is older than 90 days</td>
+        <td>The card network will not take it back</td>
+        <td>Bank transfer request. It cannot go to the card <span class="b bad">Not possible</span></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note">
+    <p>One thing did not survive the move. <strong>Splitting a refund across two cards</strong> is gone on day one. If someone paid with two cards, refund the larger one and send the rest to finance. I do not have a date for getting it back &mdash; I asked, and the answer was "not this quarter". You will hear it from me when I hear it.</p>
+  </div>
+
+  <footer>
+    Payments team &middot; September 4, 2026 &middot; Confidential &mdash; internal use only<br>
+    Questions: #payments-ops
+  </footer>
+
+</div></div>
+</body>
+</html>

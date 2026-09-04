@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="{{BCP47 language tag — en, ko, ja, zh-Hans, de, ar …}}" dir="{{ltr | rtl}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root{
+    color-scheme: light;
+    --ink:#16191d; --ink-2:#3d444d; --ink-3:#6b737d;
+    --line:#e2e6ea; --line-2:#cdd4da;
+    --bg:#ffffff; --bg-2:#f6f8fa; --bg-3:#eef2f5;
+    --ok:#1a7f4b; --ok-bg:#e8f6ee;
+    --warn:#9a6400; --warn-bg:#fdf3e0;
+    --bad:#b3261e; --bad-bg:#fdecea;
+    --key:#1b4fa8; --key-bg:#e9f0fb;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg-2); color:var(--ink);
+    font:19px/1.68 -apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Apple SD Gothic Neo",Pretendard,"Noto Sans KR","Malgun Gothic",
+         "Hiragino Sans","Yu Gothic UI","Noto Sans JP",
+         "PingFang SC","Microsoft YaHei","Noto Sans SC",
+         "PingFang TC","Microsoft JhengHei","Noto Sans TC",
+         "Noto Sans Arabic","Noto Sans Devanagari","Noto Sans Thai",
+         Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; text-wrap:pretty;
+  }
+  .wrap{max-width:1240px; margin:0 auto; padding:0 32px 80px}
+  .sheet{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:52px 56px; margin-top:32px}
+
+  /* ─ masthead ─ */
+  .meta{display:flex; flex-wrap:wrap; gap:10px; align-items:center; font-size:14px; color:var(--ink-3); margin-bottom:20px}
+  .tag{display:inline-block; padding:3px 10px; border-radius:999px; background:var(--bg-3); color:var(--ink-2); font-size:13px; font-weight:600}
+  .tag.confid{background:var(--bad-bg); color:var(--bad)}
+  h1{font-size:36px; line-height:1.3; letter-spacing:-.02em; margin:0 0 12px}
+  .sub{font-size:19px; color:var(--ink-2); margin:0 0 28px}
+  .lede{background:var(--key-bg); border-inline-start:4px solid var(--key);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        padding:20px 24px; margin:0 0 36px; font-size:19px}
+  .lede p{margin:0 0 10px} .lede p:last-child{margin:0}
+
+  /* ─ headings ─ */
+  h2{font-size:26px; line-height:1.35; letter-spacing:-.015em; margin:52px 0 16px; padding-top:20px; border-top:2px solid var(--ink)}
+  h2 .n{display:inline-block; min-width:34px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+  h3{font-size:21px; line-height:1.4; margin:34px 0 12px}
+  p{margin:0 0 16px}
+  strong{font-weight:700}
+  a{color:var(--key)}
+
+  /* ─ number cards ─ */
+  .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:28px 0}
+  .kpi{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .kpi b{display:block; font-size:32px; line-height:1.15; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .kpi span{display:block; margin-top:6px; font-size:15px; color:var(--ink-3); line-height:1.5}
+
+  /* ─ tables ─ */
+  .scroll{overflow-x:auto; margin:22px 0; border:1px solid var(--line); border-radius:10px}
+  table{border-collapse:collapse; width:100%; min-width:560px; font-size:17px}
+  th,td{padding:13px 16px; text-align:start; vertical-align:top; border-bottom:1px solid var(--line)}
+  th{background:var(--bg-3); font-size:15px; font-weight:700; white-space:nowrap}
+  tbody tr:last-child td{border-bottom:0}
+  td.num{text-align:end; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  /* ─ cards ─ */
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; margin:24px 0}
+  .card{background:var(--bg-2); border:1px solid var(--line); border-radius:10px; padding:20px 22px; font-size:17px}
+  .card h4{margin:0 0 8px; font-size:18px}
+  .card p:last-child{margin:0}
+
+  /* ─ badges ─ */
+  .b{display:inline-block; padding:2px 9px; border-radius:6px; font-size:14px; font-weight:700; white-space:nowrap}
+  .b.ok{background:var(--ok-bg); color:var(--ok)}
+  .b.warn{background:var(--warn-bg); color:var(--warn)}
+  .b.bad{background:var(--bad-bg); color:var(--bad)}
+  .b.key{background:var(--key-bg); color:var(--key)}
+
+  /* ─ callout ─ */
+  .note{border:1px solid var(--line-2); border-inline-start:4px solid var(--ink-3);
+        border-start-start-radius:0; border-end-start-radius:0;
+        border-start-end-radius:8px; border-end-end-radius:8px;
+        background:var(--bg-2); padding:18px 22px; margin:24px 0}
+  .note.warn{border-inline-start-color:var(--warn); background:var(--warn-bg)}
+  .note.bad{border-inline-start-color:var(--bad); background:var(--bad-bg)}
+  .note p:last-child{margin:0}
+
+  /* ─ figures ─ */
+  figure{margin:30px 0; padding:26px; background:var(--bg-2); border:1px solid var(--line); border-radius:10px; overflow-x:auto}
+  figure svg{display:block; max-width:100%; height:auto; margin:0 auto}
+  figcaption{margin-top:16px; font-size:15px; color:var(--ink-3); text-align:center; line-height:1.55}
+
+  /* ─ flow (boxes → arrows) ─ */
+  .flow{display:flex; flex-wrap:wrap; align-items:stretch; gap:0; justify-content:center}
+  .step{flex:0 1 200px; background:var(--bg); border:2px solid var(--line-2); border-radius:10px; padding:16px 18px; font-size:16px; line-height:1.5}
+  .step b{display:block; font-size:17px; margin-bottom:5px}
+  .step.on{border-color:var(--key); background:var(--key-bg)}
+  .arrow{display:flex; align-items:center; padding:0 12px; font-size:26px; color:var(--ink-3)}
+
+  /* ─ lists ─ */
+  ul,ol{margin:0 0 18px; padding-inline-start:24px}
+  li{margin-bottom:8px}
+  li:last-child{margin-bottom:0}
+
+  code{background:var(--bg-3); padding:2px 6px; border-radius:5px; font-size:.9em}
+  pre{background:var(--bg-3); padding:18px 20px; border-radius:10px; overflow-x:auto; font-size:15px; line-height:1.55}
+  pre code{background:none; padding:0}
+  /* code, paths and commands stay left-to-right even inside an RTL document */
+  code,pre,.num{direction:ltr; unicode-bidi:isolate}
+
+  footer{margin-top:56px; padding-top:22px; border-top:1px solid var(--line); font-size:14px; color:var(--ink-3); line-height:1.6}
+
+  @media (max-width:860px){
+    body{font-size:18px}
+    .wrap{padding:0 16px 60px}
+    .sheet{padding:32px 22px; border-radius:0; margin-top:0; border-inline:0}
+    h1{font-size:29px} h2{font-size:23px} h3{font-size:20px}
+    .flow{flex-direction:column} .arrow{justify-content:center; padding:8px 0; transform:rotate(90deg)}
+  }
+  @media print{
+    body{background:#fff; font-size:11pt}
+    .sheet{border:0; padding:0; margin:0}
+    h2{break-after:avoid} figure,.scroll,.note{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap"><div class="sheet">
+
+  <div class="meta">
+    <span class="tag confid">{{CONFIDENTIAL — in the document's language; delete if the doc goes outside}}</span>
+    <span class="tag">{{DOCUMENT TYPE}}</span>
+    <span>{{AUTHOR OR TEAM}} · {{DATE, formatted for the document's locale}}</span>
+  </div>
+
+  <h1>{{TITLE}}</h1>
+  <p class="sub">{{ONE-LINE SUBTITLE — what this document covers}}</p>
+
+  <div class="lede">
+    <p>{{ANSWER FIRST. The conclusion of this document in 2–3 sentences.}}</p>
+  </div>
+
+  <!-- optional: number cards
+  <div class="kpis">
+    <div class="kpi"><b>0</b><span>{{what this number counts}}</span></div>
+  </div>
+  -->
+
+  <h2><span class="n">1</span>{{FIRST SECTION}}</h2>
+  <p>{{Conclusion sentence. Evidence after it.}}</p>
+
+  <footer>
+    {{AUTHOR OR TEAM}} · {{DATE}} · {{CONFIDENTIALITY NOTICE}}<br>
+    {{CONTACT}}
+  </footer>
+
+</div></div>
+</body>
+</html>
