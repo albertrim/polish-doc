@@ -1,10 +1,14 @@
 # /polish-doc — notes into one document
 
+Version 0.1.2 — what changed in each version is in [`VERSION.md`](VERSION.md).
+
 A Claude Code skill that turns analysis output, meeting notes and drafts into **one HTML document**.
 It opens as a single file, pastes into Slack, and prints without falling apart.
 
 It is written for a reader who is not a developer. **Plain enough for a 12-year-old, short sentences, lots of pictures.**
-Then it does one more pass to strip the tells that give away AI writing.
+Then it does one more pass: nothing said twice, nothing from the source left out, and the tells that give away AI writing stripped.
+
+**Existing documents keep their look.** Give it an `.html` document that already has its own fonts, colors and layout, and only the text changes.
 
 **Any language.** By default the document comes out in your OS locale's language — a `ko_KR` machine produces Korean, a `de_DE` machine produces German — and you can override that in one word. The template ships with CJK, Arabic and Devanagari font fallbacks and logical CSS properties, so right-to-left documents lay out correctly.
 
@@ -36,11 +40,13 @@ cp -R skill/polish-doc ~/.claude/skills/
 /polish-doc analysis.md
 /polish-doc ~/Downloads/meeting-notes.txt reference.html
 /polish-doc <paste the content you want documented>
+/polish-doc report.html          ← an existing document. Keeps its fonts, colors and layout; fixes the text
 /polish-doc                      ← documents whatever you just produced. Asks what to build if there's nothing
 ```
 
 Give it several files and it **merges them into one document.** It does not give each file its own section.
-The result is saved next to the source file as `<topic>-<purpose>-<YYYYMMDD>.html`.
+A new document is saved next to the source file as `<topic>-<purpose>-<YYYYMMDD>.html`.
+An existing document is saved next to the original as `<name>-polished.html`; the original is untouched.
 
 Open `example/sample-en.html` or `example/sample-ko.html` in a browser and you will see exactly what comes out. Same template, same rules, two locales.
 
@@ -51,17 +57,19 @@ Open `example/sample-en.html` or `example/sample-ko.html` in a browser and you w
 | **Cuts** | Repetition, change history, openings and wrap-ups, conclusions that restate the body, adjective claims like "stable / sufficient / advanced" |
 | **Keeps** | Numbers, dates, file paths, IDs, commands, and any choice a human has to make |
 | **Draws** | Three or more steps → a flow. Things moving between systems → an architecture diagram. Belief ↔ reality → a two-column comparison. Schedules → a timeline |
-| **Revises** | Uniform sentence length, everything in threes, "First / Also / Finally", hedged endings — all of it gets fixed, in whichever language the document is in |
+| **Checks** | Nothing twice, nothing missing — every number, path and decision in the source is in the document exactly once. A gap the source cannot fill is marked, not guessed |
+| **Revises** | Uniform sentence length, everything in threes, "First / Also / Finally", "Not X but Y", announcements before the point, things doing people's jobs, hidden actors, jargon — all of it gets fixed, in whichever language the document is in |
 
 ## 4. Layout
 
 ```
 polish-doc-skill/
-├── README.md                     this file
+├── README.md                     this file — what the skill does now
+├── VERSION.md                    version history
 ├── install.sh                    installer
 ├── skill/polish-doc/
-│   ├── SKILL.md                  the rules — arguments, language, sentences, diagrams, revision
-│   └── TEMPLATE.html             skeleton and CSS. What makes every document look the same
+│   ├── SKILL.md                  the rules — arguments, language, sentences, diagrams, building, revision
+│   └── TEMPLATE.html             skeleton and CSS for new documents. What makes them look like one set
 ├── manual/
 │   └── PROMPT.md                 using it without Claude Code (claude.ai, ChatGPT, …)
 └── example/
@@ -79,14 +87,17 @@ Different complaints live in different files. Don't mix them up.
 | Sentences are long / hard / rambling | `SKILL.md` §3 sentence rules |
 | It picks the wrong language | `SKILL.md` §2 language |
 | It doesn't draw pictures | `SKILL.md` §4 diagrams |
-| It reads like AI wrote it | `SKILL.md` §6 revision |
+| It reads like AI wrote it | `SKILL.md` §6 revision, pass 3 |
+| It says something twice, or dropped something from the source | `SKILL.md` §6 revision, passes 1 and 2 |
+| It restyled a document that already had a look | `SKILL.md` §5, existing document |
 | Filename or where files land | `SKILL.md` §5 |
 
 Re-run `./install.sh` after editing.
 
 ## 6. Worth knowing
 
-- **The template CSS is not edited per document.** The documents have to look like one set. Change `TEMPLATE.html` instead.
+- **New documents all use the template CSS, unchanged.** They have to look like one set; change `TEMPLATE.html` instead.
+- **An existing `.html` document keeps its own CSS.** The skill changes its text, not its look. Say "match the standard look" if you want it moved onto the template.
 - The **confidential tag in the masthead is the default**, translated into the document's language. Tell it to drop the tag for anything going outside the company.
 - No external scripts, CDNs or image files. Pictures are inline SVG or CSS boxes. **Send one file and the other person sees exactly what you see.**
 - Want a shareable link? Build the document first, then say "publish this as a link".
